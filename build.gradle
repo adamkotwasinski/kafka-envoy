@@ -1,0 +1,27 @@
+apply plugin: 'eclipse'
+apply plugin: 'java'
+apply plugin: 'checkstyle'
+apply plugin: 'findbugs'
+
+dependencies {
+    def kafka_version = "2.1.0"
+    compile("org.apache.kafka:kafka-clients:${kafka_version}")
+    compile("org.apache.kafka:kafka_2.12:${kafka_version}")
+
+    compile('org.apache.commons:commons-lang3:3.9')
+    compile('com.google.guava:guava:28.0-jre')
+    compile("org.slf4j:slf4j-log4j12:1.6.1")
+
+    testCompile("junit:junit:4.12")
+}
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'envoy.KafkaEnvoy'
+    }
+    baseName = 'kafka-envoy'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+tasks.eclipse.dependsOn(cleanEclipse)
